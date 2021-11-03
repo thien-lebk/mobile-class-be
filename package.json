@@ -12,7 +12,6 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "next start -p $PORT",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku-postbuild": "npm run build",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
