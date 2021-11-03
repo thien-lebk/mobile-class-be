@@ -37,6 +37,7 @@
     "email-templates": "^8.0.8",
     "handlebars": "^4.7.7",
     "moment": "^2.29.1",
+    "passport": "^0.5.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "pg": "^8.7.1",
