@@ -3,11 +3,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { ScheduleModule } from '@nestjs/schedule';
-import { CronJobModule } from 'src/lib/cron-job/cron-job.module';
+// import { CronJobModule } from 'src/lib/cron-job/cron-job.module';
 import { HealthController } from 'src/lib/health/health.controller';
 import { TerminusModule } from '@nestjs/terminus';
 import { AwsModule } from 'src/lib/aws/aws.module';
-import { AppGateway } from './app.gateway';
+// import { AppGateway } from './app.gateway';
 import { CustomerModule } from './customer/customer.module';
 import { UserModule } from './user/user.module';
 import { EmailModule } from './email/email.module';
@@ -26,8 +26,8 @@ import { AuthModule } from './auth/auth.module';
     ConfigModule.forRoot({
       envFilePath: `env/${process.env.NODE_ENV || 'local'}.env`,
     }),
-    ScheduleModule.forRoot(),
-    CronJobModule,
+    // ScheduleModule.forRoot(),
+    // CronJobModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -72,6 +72,7 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
   controllers: [HealthController, AppController],
-  providers: [AppGateway],
+  providers: [],
+  // AppGateway
 })
 export class AppModule {}
