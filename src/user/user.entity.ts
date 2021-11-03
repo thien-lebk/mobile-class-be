@@ -15,79 +15,59 @@ export class User extends BaseEntity {
 
   @ApiProperty()
   @Column()
-  first_name: string;
+  fullName: string;
 
   @ApiProperty()
   @Column()
-  last_name: string;
-
-  @ApiProperty()
-  @Column({ length: 50 })
-  phone_number: string;
+  aboutYou: string;
 
   @ApiProperty()
   @Column()
   email: string;
-
-  @ApiProperty()
-  @Column()
-  is_deleted: boolean;
-
-  @ApiProperty()
-  @Column()
-  is_actived: boolean;
-
-  @ApiProperty()
-  @Column()
-  is_first_login: boolean;
 
   @ApiHideProperty()
   @Column()
   @Exclude()
   password: string;
 
-  @Column({ length: 6 })
-  @Exclude()
-  personal_id: string;
-
-  @Column()
-  @Exclude()
-  personal_email: string;
-
-  @Column()
-  @Exclude()
-  position: string;
-
   @ApiHideProperty()
   @Column()
   @Exclude()
   salt: string;
 
+  @Column()
+  @Exclude()
+  phoneNumber: string;
+
   @ApiProperty()
-  @Column({
-    type: 'timestamp without time zone',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  created_at: Date;
+  @Column()
+  isDeleted: boolean;
+
+  @ApiProperty()
+  @Column()
+  isActived: boolean;
+
+  @ApiProperty()
+  @Column()
+  isFirst_login: boolean;
 
   @ApiProperty()
   @Column({
     type: 'timestamp without time zone',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  updated_at: Date;
+  createdAt: Date;
+
+  @ApiProperty()
+  @Column({
+    type: 'timestamp without time zone',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
 
   @ApiProperty()
   @Column()
   dob: Date;
-
-  @ApiProperty()
-  @Column()
-  uuid: string;
-
-  @ApiProperty()
-  @Column()
-  profile_photo_key: string;
 
   async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);

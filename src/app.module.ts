@@ -17,6 +17,9 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { PostModule } from './post/post.module';
 import { CategoryModule } from './category/category.module';
 import { TopicModule } from './topic/topic.module';
+import { HobbyModule } from './hobby/hobby.module';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     PrometheusModule.register(),
@@ -46,6 +49,16 @@ import { TopicModule } from './topic/topic.module';
           namingStrategy: new SnakeNamingStrategy(),
         } as TypeOrmModuleOptions),
     }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: `${configService.get<string>('JWT_EXPIRATION_TIME')}s`,
+        },
+      }),
+    }),
     TerminusModule,
     AwsModule,
     CustomerModule,
@@ -55,6 +68,8 @@ import { TopicModule } from './topic/topic.module';
     PostModule,
     CategoryModule,
     TopicModule,
+    HobbyModule,
+    AuthModule,
   ],
   controllers: [HealthController, AppController],
   providers: [AppGateway],

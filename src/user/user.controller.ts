@@ -8,6 +8,7 @@ import {
   Delete,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,6 +18,7 @@ import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { GetAllUserDto } from './dto/get-all-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
 import { AcitveUserDto } from './dto/active-user.dto';
+import JwtAuthenticationGuard from 'src/auth/jwt-authentication.guard';
 
 @Controller('user')
 export class UserController {
@@ -116,10 +118,11 @@ export class UserController {
     status: 200,
     description: 'Lấy dữ liệu người dùng thành công',
   })
+  @UseGuards(JwtAuthenticationGuard)
   @ApiOperation({ summary: 'Xem chi tiết người dùng.' })
   async getUserById(@Param('id') id: number) {
     return await this.connection.transaction((transactionManager) => {
-      return this.userService.getUserById(transactionManager, id);
+      return this.userService.getUserById(id);
     });
   }
 

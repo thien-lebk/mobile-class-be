@@ -3,7 +3,7 @@ import {
   Logger,
   InternalServerErrorException,
   ConflictException,
-  NotFoundException
+  NotFoundException,
 } from '@nestjs/common';
 import {
   Repository,
@@ -16,63 +16,36 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
-import { isNullOrUndefined,paramStringToJson } from '../lib/utils/util';
+import { isNullOrUndefined, paramStringToJson } from '../lib/utils/util';
 import { GetAllUserDto } from './dto/get-all-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
 
 @EntityRepository(User)
-export class UserRepository extends Repository<User>{
+export class UserRepository extends Repository<User> {
   async createUser(
     transactionEntityManager: EntityManager,
     createUserDto: CreateUserDto,
   ) {
-    const { email, password,
-      firstName:firstName,
-      lastName:lastName,
-      phoneNumber:phoneNumber,
-      dob,
-      position,
-      personalEmail:personalEmail,
-      profilePhotoKey:profilePhotoKey
-    } = createUserDto
-    // Check user existed?
-      const query = transactionEntityManager
-      .getRepository(User)
-      .createQueryBuilder('user')
-      .where('(user.email = :email)', {
-        email,
-      }).andWhere('user.is_deleted = FALSE');
-      const existsUser = await query.getOne();
-      if (existsUser) {
-        throw new ConflictException(
-          `Người dùng đã tồn tại trong hệ thống, vui lòng sử dụng email khác để đăng kí.`,
-        );
-      }
-
-  
+    const { email, password, fullName, aboutYou, phoneNumber, dob } =
+      createUserDto;
 
     // hash password
     const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(uuidv4(), salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     // create user
     const user = transactionEntityManager.create(User, {
-      personal_email: personalEmail,
-      first_name: firstName,
-      last_name: lastName,
-      phone_number: phoneNumber,
-      email: email,
+      phoneNumber,
+      fullName,
+      email,
       password: hashedPassword,
       salt: salt,
-      created_at: new Date(),
-      updated_at: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
       dob: dob,
-      position: position,
-      uuid:uuidv4(),
-      profile_photo_key:profilePhotoKey
     });
 
-    // save user    
+    // save user
     try {
       await transactionEntityManager.save(user);
     } catch (error) {
@@ -90,10 +63,9 @@ export class UserRepository extends Repository<User>{
     uuid: string,
   ) {
     const { cannotDelete } = deleteUserDto;
-    
-    const user = await transactionManager
-      .getRepository(User)
-      .findOne({uuid: uuid });
+
+    let user;
+    // = await transactionManager.getRepository(User).findOne({ uuid });
     if (!user) {
       throw new InternalServerErrorException(`Không tìm thấy người dùng.`);
     }
@@ -103,7 +75,7 @@ export class UserRepository extends Repository<User>{
       );
     }
     try {
-      await transactionManager.update(User, { uuid }, { is_deleted: true });
+      await transactionManager.update(User, { uuid }, { isDeleted: true });
     } catch (error) {
       Logger.error(error);
       throw new InternalServerErrorException(
@@ -112,58 +84,34 @@ export class UserRepository extends Repository<User>{
     }
     return { statusCode: 200, message: `Xóa người dùng thành công.` };
   }
-  async getUserByUuid(transactionManager: EntityManager, uuid: string) {
-    const query = transactionManager
-      .getRepository(User)
-      .createQueryBuilder('user')
-      .select([
-        'user.id',
-        'user.uuid',
-        'user.email',
-        'user.personal_email',
-        'user.first_name',
-        'user.last_name',
-        'user.phone_number',
-        'user.dob',
-        'user.position',
-        'user.is_deleted',
-        'user.is_actived'
-      ])
-      .andWhere('user.uuid = :uuid', { uuid })
 
-    const data = await query.getOne();
+  // async getUserById(transactionManager: EntityManager, id: number) {
+  //   const query = transactionManager
+  //     .getRepository(User)
+  //     .createQueryBuilder('user')
+  //     .select([
+  //       'user.id',
+  //       'user.email',
+  //       'user.personal_email',
+  //       'user.first_name',
+  //       'user.last_name',
+  //       'user.phone_number',
+  //       'user.dob',
+  //       'user.position',
+  //       'user.is_deleted',
 
-   
+  //     ])
+  //     .andWhere('user.id = :id', { id })
+  //     .andWhere('user.is_deleted = FALSE');
 
-    return { data };
-  }
-  async getUserById(transactionManager: EntityManager, id: number) {
-    const query = transactionManager
-      .getRepository(User)
-      .createQueryBuilder('user')
-      .select([
-        'user.id',
-        'user.email',
-        'user.personal_email',
-        'user.first_name',
-        'user.last_name',
-        'user.phone_number',
-        'user.dob',
-        'user.position',
-        'user.is_deleted',
-      
-      ])
-      .andWhere('user.id = :id', { id })
-      .andWhere('user.is_deleted = FALSE');
+  //   const data = await query.getOne();
 
-    const data = await query.getOne();
+  //   if (isNullOrUndefined(data)) {
+  //     throw new NotFoundException(`Không tìm thấy người dùng.`);
+  //   }
 
-    if (isNullOrUndefined(data)) {
-      throw new NotFoundException(`Không tìm thấy người dùng.`);
-    }
-
-    return { statusCode: 200, data };
-  }
+  //   return { statusCode: 200, data };
+  // }
   async getAllUser(
     transactionManager: EntityManager,
     getAllUserDto: GetAllUserDto,
@@ -173,7 +121,7 @@ export class UserRepository extends Repository<User>{
     if (isNullOrUndefined(perPage)) {
       perPage = 25;
     }
-    
+
     const query = transactionManager
       .getRepository(User)
       .createQueryBuilder('user')
@@ -198,24 +146,15 @@ export class UserRepository extends Repository<User>{
 
     // Full text search
     if (!isNullOrUndefined(fullTextSearch) && fullTextSearch !== '') {
-      query.andWhere(
-        'LOWER(user.name) LIKE LOWER(:name)',
-        {
-          name: `%${fullTextSearch}%`,
-        },
-      );
-      query.orWhere(
-        'LOWER(user.username) LIKE LOWER(:username)',
-        {
-          username: `%${fullTextSearch}%`,
-        },
-      );
-      query.orWhere(
-        'LOWER(user.email) LIKE LOWER(:email) ',
-        {
-          email: `%${fullTextSearch}%`,
-        },
-      );
+      query.andWhere('LOWER(user.name) LIKE LOWER(:name)', {
+        name: `%${fullTextSearch}%`,
+      });
+      query.orWhere('LOWER(user.username) LIKE LOWER(:username)', {
+        username: `%${fullTextSearch}%`,
+      });
+      query.orWhere('LOWER(user.email) LIKE LOWER(:email) ', {
+        email: `%${fullTextSearch}%`,
+      });
     }
 
     // Filter list
@@ -244,23 +183,16 @@ export class UserRepository extends Repository<User>{
     if (!isNullOrUndefined(sorts)) {
       const object = paramStringToJson(sorts);
 
-
       if (!isNullOrUndefined(object.email)) {
         query.orderBy('user.email', object.email);
       }
-
-   
     }
     try {
       const data = await query.getMany();
-    const total = await query.getCount();
-    return { statusCode: 200, data: { data, total } };
-
+      const total = await query.getCount();
+      return { statusCode: 200, data: { data, total } };
     } catch (error) {
       console.log(error);
-      
     }
-    
-
   }
 }

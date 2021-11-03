@@ -1,48 +1,31 @@
 import {
-    IsEmail,
-    IsNotEmpty,
-    IsString,
-    Length,
-    Matches,
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Length,
+  Matches,
 } from 'class-validator';
 
-
 export class CreateUserDto {
-    @IsString()
-    @IsNotEmpty()
-    email: string;
+  @IsString()
+  @IsNotEmpty()
+  email: string;
 
-    @IsString()
-    @IsNotEmpty()
-    personalEmail: string;
+  @IsString()
+  @IsNotEmpty()
+  fullName: string;
 
-    @IsString()
-    profilePhotoKey: string;
+  @IsString()
+  aboutYou: string;
 
-    @IsString()
-    @IsNotEmpty()
-    password: string;
+  @IsString()
+  @IsNotEmpty()
+  password: string;
 
-    @IsString()
-    @IsNotEmpty()
-    firstName: string;
+  @IsString()
+  @IsNotEmpty()
+  phoneNumber: string;
 
-    @IsString()
-    @IsNotEmpty()
-    lastName: string;
-
-    @IsString()
-    @IsNotEmpty()
-    phoneNumber: string;
-
-    @IsNotEmpty()
-    dob: Date;
-
-    @IsString()
-    @IsNotEmpty()
-    position: string;
-
-    @IsString()
-    personalId: string;
+  @IsNotEmpty()
+  dob: Date;
 }
-
