@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { PrometheusModule } from '@willsoto/nestjs-prometheus';
-import { ScheduleModule } from '@nestjs/schedule';
+// import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+// import { ScheduleModule } from '@nestjs/schedule';
 // import { CronJobModule } from 'src/lib/cron-job/cron-job.module';
-import { HealthController } from 'src/lib/health/health.controller';
-import { TerminusModule } from '@nestjs/terminus';
+// import { HealthController } from 'src/lib/health/health.controller';
+// import { TerminusModule } from '@nestjs/terminus';
 import { AwsModule } from 'src/lib/aws/aws.module';
 // import { AppGateway } from './app.gateway';
 import { CustomerModule } from './customer/customer.module';
@@ -22,7 +22,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
-    PrometheusModule.register(),
+    // PrometheusModule.register(),
     ConfigModule.forRoot({
       envFilePath: `env/${process.env.NODE_ENV || 'local'}.env`,
     }),
@@ -59,7 +59,7 @@ import { AuthModule } from './auth/auth.module';
         },
       }),
     }),
-    TerminusModule,
+    // TerminusModule,
     AwsModule,
     CustomerModule,
     UserModule,
@@ -71,7 +71,7 @@ import { AuthModule } from './auth/auth.module';
     HobbyModule,
     AuthModule,
   ],
-  controllers: [HealthController, AppController],
+  controllers: [AppController],
   providers: [],
   // AppGateway
 })
