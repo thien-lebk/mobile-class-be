@@ -19,7 +19,9 @@ import { GetAllUserDto } from './dto/get-all-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
 import { AcitveUserDto } from './dto/active-user.dto';
 import JwtAuthenticationGuard from 'src/auth/jwt-authentication.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(

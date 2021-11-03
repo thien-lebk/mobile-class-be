@@ -2,7 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { HobbyService } from './hobby.service';
 import { CreateHobbyDto } from './dto/create-hobby.dto';
 import { UpdateHobbyDto } from './dto/update-hobby.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Hobby')
 @Controller('hobby')
 export class HobbyController {
   constructor(private readonly hobbyService: HobbyService) {}

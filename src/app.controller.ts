@@ -14,10 +14,8 @@ export class AppController {
   ) {}
 
   @UseGuards(LocalAuthGuard)
-  @Post('/dang-nhap-tai-khoan')
+  @Post('/login')
   async login(@Body() loginDto: LoginDto) {
-    console.log(loginDto);
-    console.log(123);
 
     return await this.connection.transaction((transactionManager) => {
       return this.user$.login(transactionManager, loginDto);
