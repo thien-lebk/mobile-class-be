@@ -18,7 +18,7 @@ async function bootstrap() {
   });
 
   SwaggerModule.setup('/api/docs', app, null, {
-    swaggerUrl: `http://localhost:8888/api/docs/swagger.json`,
+    swaggerUrl: `https://mobile-app-123.herokuapp.com/api/docs/swagger.json`,
     explorer: true,
     swaggerOptions: {
       docExpansion: 'list',
