@@ -9,7 +9,7 @@
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start   --max_old_space_size=2560  dist/main.js",
+    "start": "nest start",
     "test": "jest",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
