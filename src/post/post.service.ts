@@ -66,26 +66,13 @@ export class PostService {
     }
   }
   async deletePost(id: number, userId: any) {
-    try {
-   
-      
-      const user = await this.userRepository.getInfoUser(userId);
-
-        
+    try { 
+      const user = await this.userRepository.getInfoUser(userId);     
       const post = await this.postRepository.findOne({id});
-      
-      // console.log(user);
-      // console.log(post);
-
       // if(post.user.id !== user.id){
       //   throw new ConflictException('Wrong user.');
       // }
-
-
       post.isDeleted = true;
-   
-
-
       await this.postRepository.save(post);
       return { statusCode: 201, message: 'Delete Success.' };
     } catch (error) {
@@ -95,12 +82,8 @@ export class PostService {
   }
   async updatePost(updatePostDto: UpdatePostDto, userId: any) {
     try {
-   
-      
       const user = await this.userRepository.getInfoUser(userId);
       const { content, title, images, id, isDeleted } = updatePostDto;
-
-        
       const post = await this.postRepository.findOne({id});
       
       // console.log(user);

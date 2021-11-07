@@ -27,7 +27,7 @@ export class ImageController {
     status: 200,
     description: 'Add Success.',
   })
-  @ApiOperation({ summary: 'Add image' })
+  @ApiOperation({ summary: 'Thêm hình' })
   async addImage(
     @AuthUser() user: any,
     @Body() createImageDto: CreateImageDto,
@@ -41,11 +41,23 @@ export class ImageController {
     status: 200,
     description: 'Update Success.',
   })
-  @ApiOperation({ summary: 'Update image' })
+  @ApiOperation({ summary: 'Cập nhật hình' })
   async updateImage(
     @AuthUser() user: any,
     @Body() updateImage: UpdateImageDto,
   ) {
     return await this.imageService.updateImage(updateImage, user.userId);
+  }
+
+  // xoá hình
+  @Delete('/:id')
+  @UseGuards(JwtAuthenticationGuard)
+  @ApiResponse({
+    status: 200,
+    description: 'Delete Success.',
+  })
+  @ApiOperation({ summary: 'Xoá hình' })
+  async deleteImage(@AuthUser() user: any, @Param() id: number) {
+    return await this.imageService.deleteImage(id, user.userId);
   }
 }

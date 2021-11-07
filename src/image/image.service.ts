@@ -18,7 +18,21 @@ export class ImageService {
     private imageRepo: ImageRepository,
     private userRepository: UserRepository,
   ) {}
-
+  async deleteImage(id: number, userId: any) {
+    try {
+      const user = await this.userRepository.getInfoUser(userId);
+      const img = await this.imageRepo.findOne({ id });
+      // if(post.user.id !== user.id){
+      //   throw new ConflictException('Wrong user.');
+      // }
+      img.isDeleted = true;
+      await this.imageRepo.save(img);
+      return { statusCode: 201, message: 'Delete Success.' };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('Error.');
+    }
+  }
   async updateImage(updateImage: UpdateImageDto, userId: any) {
     try {
       const image = await this.imageRepo.findOne({

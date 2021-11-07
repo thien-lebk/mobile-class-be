@@ -73,7 +73,7 @@ export class HobbyController {
     description: 'Success.',
   })
   @UseGuards(JwtAuthenticationGuard)
-  @ApiOperation({ summary: 'Cập nhật thích.' })
+  @ApiOperation({ summary: 'Cập nhật sở thích.' })
   async update(@Body() updateHobbyDto: UpdateHobbyDto) {
     return await this.hobbyService.update(updateHobbyDto);
   }

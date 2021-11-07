@@ -27,7 +27,7 @@ export class PostController {
     status: 200,
     description: 'Add Success.',
   })
-  @ApiOperation({ summary: 'Add image' })
+  @ApiOperation({ summary: 'Thêm Post' })
   async addPost(@AuthUser() user: any, @Body() createPostDto: CreatePostDto) {
     return await this.postService.createPost(createPostDto, user.userId);
   }
@@ -38,7 +38,7 @@ export class PostController {
     status: 200,
     description: 'Update Success.',
   })
-  @ApiOperation({ summary: 'Update Post' })
+  @ApiOperation({ summary: 'Cập nhật Post' })
   async updatePost(
     @AuthUser() user: any,
     @Body() updatePostDto: UpdatePostDto,
@@ -52,7 +52,7 @@ export class PostController {
     status: 200,
     description: 'Get Success.',
   })
-  @ApiOperation({ summary: 'Get list post by id user' })
+  @ApiOperation({ summary: 'Lấy danh sách Post từ id người dùng' })
   async getListPostByIdUser(@AuthUser() user: any, @Param() id: number) {
     return await this.postService.getListPostByIdUser(id);
   }
@@ -63,7 +63,7 @@ export class PostController {
     status: 200,
     description: 'Delete Success.',
   })
-  @ApiOperation({ summary: 'Delete Post' })
+  @ApiOperation({ summary: 'Xoá Post' })
   async deletePost(@AuthUser() user: any, @Param('id') id: number) {
     return await this.postService.deletePost(id, user.userId);
   }
