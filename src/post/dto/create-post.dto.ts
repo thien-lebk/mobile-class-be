@@ -17,6 +17,5 @@ export class CreatePostDto {
   content: string;
 
   @ApiProperty()
-  @IsString()
   images: number[];
 }

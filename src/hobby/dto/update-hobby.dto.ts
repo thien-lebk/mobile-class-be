@@ -1,20 +1,20 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 import { CreateHobbyDto } from './create-hobby.dto';
 
 export class UpdateHobbyDto extends PartialType(CreateHobbyDto) {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  name;
+  name: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  id;
+  id: number;
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsString()
-  isDeleted;
+  @IsBoolean()
+  isDeleted: boolean;
 }

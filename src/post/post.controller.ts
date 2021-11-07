@@ -53,7 +53,7 @@ export class PostController {
     description: 'Get Success.',
   })
   @ApiOperation({ summary: 'Lấy danh sách Post từ id người dùng' })
-  async getListPostByIdUser(@AuthUser() user: any, @Param() id: number) {
+  async getListPostByIdUser(@AuthUser() user: any, @Param('id') id: number) {
     return await this.postService.getListPostByIdUser(id);
   }
 

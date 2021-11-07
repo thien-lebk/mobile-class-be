@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsEmail,
   IsNotEmpty,
   IsString,
@@ -11,7 +12,6 @@ import { Image } from 'src/image/image.entity';
 export class UpdatePostDto {
   @ApiProperty()
   @IsNotEmpty()
-  @IsString()
   id: number;
 
   @ApiProperty()
@@ -23,11 +23,10 @@ export class UpdatePostDto {
   content: string;
 
   @ApiProperty()
-  @IsString()
   images: Image[];
 
   @ApiProperty()
-  @IsString()
+  @IsBoolean()
   @IsNotEmpty()
   isDeleted: boolean;
 }

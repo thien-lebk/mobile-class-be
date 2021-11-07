@@ -34,8 +34,5 @@ export class UpdateUserDto {
   @IsNotEmpty()
   hobbies: Hobby[];
   
-  @ApiProperty()
-  @IsBoolean()
-  isFirstLogin: boolean;
 }
 

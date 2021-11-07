@@ -57,7 +57,7 @@ export class ImageController {
     description: 'Delete Success.',
   })
   @ApiOperation({ summary: 'Xoá hình' })
-  async deleteImage(@AuthUser() user: any, @Param() id: number) {
+  async deleteImage(@AuthUser() user: any, @Param('id') id: number) {
     return await this.imageService.deleteImage(id, user.userId);
   }
 }
