@@ -1,7 +1,18 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  BaseEntity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { ApiProperty, ApiHideProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
+import { Hobby } from 'src/hobby/hobby.entity';
+import { Image } from 'src/image/image.entity';
+import { Post } from 'src/post/post.entity';
 
 @Entity({ name: 'user', schema: 'public' })
 export class User extends BaseEntity {
@@ -9,19 +20,16 @@ export class User extends BaseEntity {
     super();
     Object.assign(this, partial);
   }
-  @ApiProperty()
+
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty()
   @Column()
   fullName: string;
 
-  @ApiProperty()
   @Column()
   aboutYou: string;
 
-  @ApiProperty()
   @Column()
   email: string;
 
@@ -39,35 +47,43 @@ export class User extends BaseEntity {
   @Exclude()
   phoneNumber: string;
 
-  @ApiProperty()
   @Column()
   isDeleted: boolean;
 
-  @ApiProperty()
   @Column()
   isActived: boolean;
 
-  @ApiProperty()
   @Column()
-  isFirst_login: boolean;
+  isFirstLogin: boolean;
 
-  @ApiProperty()
   @Column({
     type: 'timestamp without time zone',
     default: () => 'CURRENT_TIMESTAMP',
   })
   createdAt: Date;
 
-  @ApiProperty()
   @Column({
     type: 'timestamp without time zone',
     default: () => 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
 
-  @ApiProperty()
   @Column()
   dob: Date;
+
+  @ManyToMany(() => Hobby)
+  @JoinTable({
+    name: 'user_hobbies_user',
+    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'hobby_id', referencedColumnName: 'id' },
+  })
+  public hobbies: Hobby[];
+
+  @OneToMany(() => Image, (image) => image.user)
+  images: Image[];
+
+  @OneToMany(() => Post, (post) => post.user)
+  posts: Post[];
 
   async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);

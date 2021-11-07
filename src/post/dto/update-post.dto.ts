@@ -6,33 +6,28 @@ import {
   Length,
   Matches,
 } from 'class-validator';
+import { Image } from 'src/image/image.entity';
 
-export class CreateUserDto {
+export class UpdatePostDto {
   @ApiProperty()
-  @IsString()
   @IsNotEmpty()
-  email: string;
-
-  @ApiProperty()
   @IsString()
-  @IsNotEmpty()
-  fullName: string;
+  id: number;
 
   @ApiProperty()
   @IsString()
-  aboutYou: string;
+  title: string;
+
+  @ApiProperty()
+  @IsString()
+  content: string;
+
+  @ApiProperty()
+  @IsString()
+  images: Image[];
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  password: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  phoneNumber: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  dob: Date;
+  isDeleted: boolean;
 }

@@ -1,3 +1,4 @@
+import { PostModule } from './post/post.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -10,6 +11,7 @@ import { EmailModule } from './email/email.module';
 import { TokenEmailModule } from './token-email/token-email.module';
 import { HobbyModule } from './hobby/hobby.module';
 import { AuthModule } from './auth/auth.module';
+import { ImageModule } from './image/image.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -49,7 +51,9 @@ import { AuthModule } from './auth/auth.module';
       }),
     }),
     UserModule,
+    ImageModule,
     EmailModule,
+    PostModule,
     TokenEmailModule,
     HobbyModule,
     AuthModule,

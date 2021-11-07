@@ -1,3 +1,4 @@
+import { HobbyModule } from './../hobby/hobby.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -7,14 +8,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TokenEmailRepository } from 'src/token-email/token-email.repository';
 import { EmailModule } from 'src/email/email.module';
+import { ImageRepository } from 'src/image/image.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserRepository, TokenEmailRepository]),
+    TypeOrmModule.forFeature([
+      UserRepository,
+      TokenEmailRepository,
+      ImageRepository,
+    ]),
     ConfigModule.forRoot({
       envFilePath: `env/${process.env.NODE_ENV || 'local'}.env`,
     }),
     EmailModule,
+    HobbyModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

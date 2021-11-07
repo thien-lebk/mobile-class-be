@@ -1,39 +1,41 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
-    IsEmail,
-    IsNotEmpty,
-    IsString,
-    Length,
-    Matches,
-    IsBoolean,
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Length,
+  Matches,
+  IsBoolean,
 } from 'class-validator';
-
+import { Hobby } from 'src/hobby/hobby.entity';
+import { Image } from 'src/image/image.entity';
 
 export class UpdateUserDto {
-    @IsString()
-    email: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  fullName: string;
 
-    @IsString()
-    firstName: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  aboutYou: string;
 
-    @IsString()
-    lastName: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  dob: Date;
 
-    @IsString()
-    phoneNumber: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  phoneNumber: string;
 
-    @IsNotEmpty()
-    dob: Date;
-
-    @IsString()
-    position: string;
-
-    @IsBoolean()
-    isDeleted: boolean;
-
-    @IsString()
-    personalEmail: string;
-
-    @IsString()
-    profilePhotoKey: string;
-
+  @ApiProperty()
+  @IsNotEmpty()
+  hobbies: Hobby[];
+  
+  @ApiProperty()
+  @IsBoolean()
+  isFirstLogin: boolean;
 }
+

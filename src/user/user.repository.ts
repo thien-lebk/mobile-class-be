@@ -1,3 +1,4 @@
+import { GetAllUserPageDto } from './dto/get-all-user-page.dto';
 /* eslint-disable prettier/prettier */
 import {
   Logger,
@@ -11,6 +12,8 @@ import {
   getRepository,
   EntityManager,
   getConnection,
+  Connection,
+  Brackets,
 } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
@@ -18,10 +21,41 @@ import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { isNullOrUndefined, paramStringToJson } from '../lib/utils/util';
 import { GetAllUserDto } from './dto/get-all-user.dto';
-import { DeleteUserDto } from './dto/delete-user.dto';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
+  constructor(private connection: Connection) {
+    super();
+  }
+
+  async getInfoUser(id: number): Promise<any> {
+    const query = this.connection
+      .getRepository(User)
+      .createQueryBuilder('user')
+      .where('user.id=:id and user.isDeleted = false', { id })
+      .select([
+        'user.id',
+        'user.fullName',
+        'user.dob',
+        'hobby.name',
+        'user.aboutYou',
+        'user.dob',
+        'user.phoneNumber',
+        'user.isFirstLogin',
+      ])
+      .leftJoinAndSelect('user.hobbies', 'hobby', 'hobby.isDeleted = false')
+      .leftJoinAndSelect('user.images', 'image', 'image.isDeleted = false');
+
+    try {
+      const data = await query.getOne();
+
+      return data;
+    } catch (error) {
+      console.log(error);
+
+      throw new InternalServerErrorException('Error');
+    }
+  }
   async createUser(
     transactionEntityManager: EntityManager,
     createUserDto: CreateUserDto,
@@ -40,6 +74,8 @@ export class UserRepository extends Repository<User> {
       email,
       password: hashedPassword,
       salt: salt,
+      isFirstLogin: true,
+      aboutYou,
       createdAt: new Date(),
       updatedAt: new Date(),
       dob: dob,
@@ -50,74 +86,20 @@ export class UserRepository extends Repository<User> {
       await transactionEntityManager.save(user);
     } catch (error) {
       Logger.error(error);
-      throw new InternalServerErrorException(
-        'Lỗi hệ thống trong quá trình tạo người dùng, vui lòng thử lại sau.',
-      );
+      throw new InternalServerErrorException('Error.');
     }
 
     return user;
   }
-  async deleteUser(
-    transactionManager: EntityManager,
-    deleteUserDto: DeleteUserDto,
-    uuid: string,
-  ) {
-    const { cannotDelete } = deleteUserDto;
 
-    let user;
-    // = await transactionManager.getRepository(User).findOne({ uuid });
-    if (!user) {
-      throw new InternalServerErrorException(`Không tìm thấy người dùng.`);
-    }
-    if (cannotDelete === true) {
-      throw new InternalServerErrorException(
-        `Không thể xóa người dùng này. Người dùng này đã bị ràng buộc với hoạt động trong ứng dụng. Thay vào đó, hãy hủy kích hoạt người dùng?`,
-      );
-    }
-    try {
-      await transactionManager.update(User, { uuid }, { isDeleted: true });
-    } catch (error) {
-      Logger.error(error);
-      throw new InternalServerErrorException(
-        `Lỗi trong quá trình xóa người dùng, vui lòng thử lại sau.`,
-      );
-    }
-    return { statusCode: 200, message: `Xóa người dùng thành công.` };
-  }
-
-  // async getUserById(transactionManager: EntityManager, id: number) {
-  //   const query = transactionManager
-  //     .getRepository(User)
-  //     .createQueryBuilder('user')
-  //     .select([
-  //       'user.id',
-  //       'user.email',
-  //       'user.personal_email',
-  //       'user.first_name',
-  //       'user.last_name',
-  //       'user.phone_number',
-  //       'user.dob',
-  //       'user.position',
-  //       'user.is_deleted',
-
-  //     ])
-  //     .andWhere('user.id = :id', { id })
-  //     .andWhere('user.is_deleted = FALSE');
-
-  //   const data = await query.getOne();
-
-  //   if (isNullOrUndefined(data)) {
-  //     throw new NotFoundException(`Không tìm thấy người dùng.`);
-  //   }
-
-  //   return { statusCode: 200, data };
-  // }
   async getAllUser(
     transactionManager: EntityManager,
+    getAllUserPageDto: GetAllUserPageDto,
     getAllUserDto: GetAllUserDto,
   ) {
-    const { page, filter, sorts, fullTextSearch } = getAllUserDto;
-    let { perPage } = getAllUserDto;
+    const { page } = getAllUserPageDto;
+    const { filter } = getAllUserDto;
+    let { perPage } = getAllUserPageDto;
     if (isNullOrUndefined(perPage)) {
       perPage = 25;
     }
@@ -126,73 +108,67 @@ export class UserRepository extends Repository<User> {
       .getRepository(User)
       .createQueryBuilder('user')
       .select([
-        'user.uuid',
-        'user.personal_email',
-        'user.profile_photo_key',
-        'user.first_name',
-        'user.last_name',
-        'user.phone_number',
+        'user.id',
+        'user.fullName',
         'user.dob',
-        'user.position',
-        'user.email',
-        'user.is_deleted',
-        'user.is_actived',
-        'user.created_at',
-        'user.updated_at',
+        'hobby.name',
+        'user.aboutYou',
+        'user.dob',
       ])
+      .leftJoin('user.hobbies', 'hobby', 'hobby.isDeleted = FALSE')
+      .leftJoin('user.images', 'image', 'image.isDeleted = false')
+      .where('user.isDeleted = false')
       .take(perPage)
       .skip((page - 1) * perPage)
-      .orderBy('user.first_name', 'ASC');
-
-    // Full text search
-    if (!isNullOrUndefined(fullTextSearch) && fullTextSearch !== '') {
-      query.andWhere('LOWER(user.name) LIKE LOWER(:name)', {
-        name: `%${fullTextSearch}%`,
-      });
-      query.orWhere('LOWER(user.username) LIKE LOWER(:username)', {
-        username: `%${fullTextSearch}%`,
-      });
-      query.orWhere('LOWER(user.email) LIKE LOWER(:email) ', {
-        email: `%${fullTextSearch}%`,
-      });
-    }
+      .orderBy('user.fullName', 'ASC');
 
     // Filter list
     if (!isNullOrUndefined(filter)) {
-      const object = paramStringToJson(filter);
-      if (!isNullOrUndefined(object.name)) {
-        query.andWhere('LOWER(user.name) LIKE LOWER(:name)', {
-          name: `%${object.name}%`,
-        });
-      }
-
-      if (!isNullOrUndefined(object.username)) {
-        query.andWhere('LOWER(user.username) LIKE LOWER(:username)', {
-          username: `%${object.username}%`,
-        });
-      }
-
-      if (!isNullOrUndefined(object.email)) {
-        query.andWhere('LOWER(user.email) LIKE LOWER(:email)', {
-          email: `%${object.email}%`,
-        });
-      }
+      filter.hobbies.forEach((ele) => {
+        if (!isNullOrUndefined(ele)) {
+          query.andWhere('LOWER(hobby.name) LIKE LOWER(:name)', {
+            name: `%${ele}%`,
+          });
+        }
+      });
     }
 
-    // Sort list
-    if (!isNullOrUndefined(sorts)) {
-      const object = paramStringToJson(sorts);
-
-      if (!isNullOrUndefined(object.email)) {
-        query.orderBy('user.email', object.email);
-      }
-    }
     try {
       const data = await query.getMany();
+      const query2 = transactionManager
+        .getRepository(User)
+        .createQueryBuilder('user')
+        .select([
+          'user.id',
+          'user.fullName',
+          'user.dob',
+          'hobby.name',
+          'user.aboutYou',
+          'user.dob',
+        ])
+        .leftJoinAndSelect('user.hobbies', 'hobby', 'hobby.isDeleted = FALSE')
+        .leftJoinAndSelect(
+          'user.images',
+          'image',
+          "image.isDeleted = false and image.type != ''",
+        )
+        .orderBy('user.fullName', 'ASC');
+      // data.forEach(ele=>{
+      //   query2.orWhere('user.id  = :id ',{id:ele.id})
+      // })
+      query2.andWhere(
+        new Brackets((qb) => {
+          data.forEach((ele) => {
+            qb.orWhere(`user.id  = ${ele.id}`);
+          });
+        }),
+      );
       const total = await query.getCount();
-      return { statusCode: 200, data: { data, total } };
+      const data2 = await query2.getMany();
+      return { statusCode: 200, data: { data: data2, total: total } };
     } catch (error) {
       console.log(error);
+      throw new InternalServerErrorException('Error.');
     }
   }
 }

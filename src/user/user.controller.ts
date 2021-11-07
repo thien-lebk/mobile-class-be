@@ -1,3 +1,4 @@
+import { GetAllUserPageDto } from './dto/get-all-user-page.dto';
 import {
   Controller,
   Get,
@@ -16,10 +17,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Connection } from 'typeorm';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { GetAllUserDto } from './dto/get-all-user.dto';
-import { DeleteUserDto } from './dto/delete-user.dto';
 import { AcitveUserDto } from './dto/active-user.dto';
 import JwtAuthenticationGuard from 'src/auth/jwt-authentication.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { AuthUser } from './user.decorater';
 
 @ApiTags('User')
 @Controller('user')
@@ -29,15 +30,23 @@ export class UserController {
     private connection: Connection,
   ) {}
 
-  @Get()
+  @Get('/list')
+  @UseGuards(JwtAuthenticationGuard)
   @ApiResponse({
     status: 200,
     description: 'Lấy danh sách người dùng thành công.',
   })
   @ApiOperation({ summary: 'Danh sách người dùng' })
-  async getAllUser(@Query() getAllUserDto: GetAllUserDto) {
+  async getAllUser(
+    @Query() getAllUserPageDto: GetAllUserPageDto,
+    @Body() getAllUserDto: GetAllUserDto,
+  ) {
     return await this.connection.transaction((transactionManager) => {
-      return this.userService.getAllUser(transactionManager, getAllUserDto);
+      return this.userService.getAllUser(
+        transactionManager,
+        getAllUserPageDto,
+        getAllUserDto,
+      );
     });
   }
 
@@ -58,20 +67,7 @@ export class UserController {
     });
   }
 
-  @Post('/active')
-  @ApiResponse({
-    status: 500,
-    description: 'Lỗi hệ thống trong quá kích hoạt người dùng.',
-  })
-  @ApiOperation({ summary: 'Kích hoạt người dùng' })
-  @ApiResponse({ status: 201, description: 'Kích hoạt người dùng thành công' })
-  async activeUser(@Body() acitveUserDto: AcitveUserDto) {
-    return await this.connection.transaction((transactionManager) => {
-      return this.userService.activeUser(transactionManager, acitveUserDto);
-    });
-  }
-
-  @Put('/:uuid')
+  @Put()
   @ApiResponse({
     status: 500,
     description: 'Lỗi trong quá trình chỉnh sửa thông tin người dùng.',
@@ -81,15 +77,17 @@ export class UserController {
     description: 'Chỉnh sửa thông tin người dùng thành công',
   })
   @ApiOperation({ summary: 'Chỉnh sửa người dùng.' })
+  @UseGuards(JwtAuthenticationGuard)
   async update(
     @Body() updateUserDto: UpdateUserDto,
     @Param('uuid') uuid: string,
+    @AuthUser() user: any,
   ) {
     return await this.connection.transaction((transactionManager) => {
       return this.userService.updateUser(
         transactionManager,
         updateUserDto,
-        uuid,
+        user,
       );
     });
   }
@@ -107,7 +105,7 @@ export class UserController {
     });
   }
 
-  @Get('/:id')
+  @Get()
   @ApiResponse({
     status: 500,
     description: 'Lỗi trong quá trình lấy thông tin người dùng.',
@@ -122,32 +120,9 @@ export class UserController {
   })
   @UseGuards(JwtAuthenticationGuard)
   @ApiOperation({ summary: 'Xem chi tiết người dùng.' })
-  async getUserById(@Param('id') id: number) {
-    return await this.connection.transaction((transactionManager) => {
-      return this.userService.getUserById(id);
-    });
-  }
-
-  @Delete('/:uuid')
-  @ApiResponse({
-    status: 500,
-    description: 'Lỗi trong quá trình xóa người dùng.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Xóa người dùng thành công',
-  })
-  @ApiOperation({ summary: 'Xóa người dùng.' })
-  async deleteUser(
-    @Body() deleteUserDto: DeleteUserDto,
-    @Param('uuid') uuid: string,
-  ) {
-    return await this.connection.transaction((transactionManager) => {
-      return this.userService.deleteUser(
-        transactionManager,
-        deleteUserDto,
-        uuid,
-      );
+  async getDetailUser(@AuthUser() user: any) {
+    return await this.connection.transaction(async (transactionManager) => {
+      return await this.userService.getUserById(user.userId);
     });
   }
 }

@@ -22,7 +22,6 @@ import { ConfigService } from '@nestjs/config';
 import { CreateTokenEmailDto } from 'src/email/dto/create-token-email.dto';
 import { TokenEmailRepository } from 'src/token-email/token-email.repository';
 import { EmailInfoDto } from 'src/email/dto/email-info.dto';
-import { DeleteUserDto } from './dto/delete-user.dto';
 import { EmailService } from 'src/email/email.service';
 import { v4 as uuidv4 } from 'uuid';
 import e from 'express';
@@ -31,68 +30,25 @@ import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { TokenPayload } from './dto/token-payload.dto';
 import { JwtService } from '@nestjs/jwt';
+import { GetAllUserPageDto } from './dto/get-all-user-page.dto';
+import { HobbyService } from 'src/hobby/hobby.service';
 
 @Injectable()
 export class UserService {
-  activeUser(
-    transactionManager: EntityManager,
-    acitveUserDto: AcitveUserDto,
-  ): Promise<unknown> {
-    throw new Error('Method not implemented.');
-  }
-  // if (!user) {
-  //   throw new InternalServerErrorException(
-  //     `Không tìm thấy người dùng với email ${email}.`,
-  //   );
-  // }
-  // // set expired date for link
-  // const expired = new Date();
-  // expired.setDate(expired.getDate() + 7);
-  // const resetPasswordTokenDto: ResetPasswordTokenDto = {
-  //   email: email,
-  //   timeStamp: expired.toString(),
-  //   isActive: false,
-  //   type: TokenEmailType.RESET_PASSWORD,
-  // };
-  // // encrypt token
-  // const token = this.encryptDataToToken(resetPasswordTokenDto);
-  // //create token email
-  // const createTokenEmailDto: CreateTokenEmailDto = {
-  //   userId: user.id,
-  //   token,
-  //   type: resetPasswordTokenDto.type,
-  // };
-  // await this.tokenEmailRepository.createTokenEmail(
-  //   transactionManager,
-  //   createTokenEmailDto,
-  // );
-  // const emailInfoDto: EmailInfoDto = {
-  //   email,
-  //   name: user.first_name + user.last_name,
-  //   token,
-  //   username: user.email,
-  // };
-  // user.isForgetPassword = true;
-  // try {
-  //   await transactionManager.save(user);
-  // } catch (error) {
-  //   Logger.error(error);
-  // }
-  // // send email
-  // return this.emailService.sendResetPasswordEmail(emailInfoDto, originName);
-
   constructor(
     private usersRepository: UserRepository,
     private configService: ConfigService,
     private tokenEmailRepository: TokenEmailRepository,
     private emailService: EmailService,
     private readonly jwtService: JwtService,
+    private hobbyService: HobbyService,
   ) {}
   async getUserByEmail(email: string): Promise<any> {
     return await this.usersRepository.findOne({ email });
   }
   async getUserById(id: number): Promise<unknown> {
-    return await this.usersRepository.findOne({ id });
+    const data = await this.usersRepository.getInfoUser(id);
+    return { statusCode: 201, message: 'Get Success.', data };
   }
   async login(
     transactionManager: EntityManager,
@@ -135,51 +91,44 @@ export class UserService {
   async updateUser(
     transactionManager: EntityManager,
     updateUserDto: UpdateUserDto,
-    uuid: string,
+    id: string,
   ) {
-    const {
-      firstName,
-      lastName,
-      phoneNumber,
-      dob,
-      position,
-      isDeleted,
-      personalEmail,
-      profilePhotoKey,
-    } = updateUserDto;
+    const { fullName, aboutYou, dob, phoneNumber, hobbies } = updateUserDto;
 
-    let user;
+    const user = await this.usersRepository.findOne(id);
 
     if (isNullOrUndefined(user)) {
       throw new InternalServerErrorException('User is not exist.');
     }
-
+    user.fullName = fullName;
+    user.aboutYou = aboutYou;
+    user.dob = dob;
+    user.phoneNumber = phoneNumber;
+    // console.log(hobbies);
+    const hobbiesList = await this.hobbyService.getListForUpdateUser(hobbies);
+    console.log(hobbiesList);
+    user.hobbies = hobbiesList;
     try {
-      // await transactionManager.update(
-      //   User,
-      //   { id: user.id },
-      //   {
-      //     0firstName,
-      //     last_name: lastName,
-      //     phone_number: phoneNumber,
-      //     dob,
-      //     position,
-      //     is_deleted: isDeleted,
-      //     personal_email: personalEmail,
-      //     profile_photo_key: profilePhotoKey,
-      //   },
-      // );
+      await this.usersRepository.save(user);
+      return { statusCode: 200, message: 'Update success.' };
     } catch (error) {
       Logger.error(error);
+      console.log(error);
+
       throw new InternalServerErrorException('Error when update user.');
     }
-    return { statusCode: 200, message: 'Update success.' };
   }
   async getAllUser(
     transactionManager: EntityManager,
+    getAllUserPageDto: GetAllUserPageDto,
     getAllUserDto: GetAllUserDto,
   ) {
-    return this.usersRepository.getAllUser(transactionManager, getAllUserDto);
+    const data = await this.usersRepository.getAllUser(
+      transactionManager,
+      getAllUserPageDto,
+      getAllUserDto,
+    );
+    return { statusCode: 201, message: 'Get success.', data };
   }
   public async verifyPassword(
     plainTextPassword: string,
@@ -203,17 +152,7 @@ export class UserService {
       access: token,
     };
   }
-  async deleteUser(
-    transactionManager: EntityManager,
-    deleteUserDto: DeleteUserDto,
-    uuid: string,
-  ) {
-    return this.usersRepository.deleteUser(
-      transactionManager,
-      deleteUserDto,
-      uuid,
-    );
-  }
+
   async sendResetPasswordEmail(
     transactionManager: EntityManager,
     email: string,

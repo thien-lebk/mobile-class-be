@@ -7,32 +7,20 @@ import {
   Matches,
 } from 'class-validator';
 
-export class CreateUserDto {
+export class UpdateImageDto {
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
-  email: string;
+  id: number;
 
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
-  fullName: string;
+  type: string;
 
   @ApiProperty()
   @IsString()
-  aboutYou: string;
+  content: string;
 
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
-  password: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  phoneNumber: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  dob: Date;
+  isDeleted: boolean;
 }
