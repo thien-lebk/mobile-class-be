@@ -20,8 +20,8 @@ async function bootstrap() {
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
   SwaggerModule.setup('/api/docs', app, null, {
-    // swaggerUrl: `https://mobile-app-123.herokuapp.com/api/docs/swagger.json`,
-    swaggerUrl: `http://localhost:8888/api/docs/swagger.json`,
+    swaggerUrl: `https://mobile-app-123.herokuapp.com/api/docs/swagger.json`,
+    // swaggerUrl: `http://localhost:8888/api/docs/swagger.json`,
 
     explorer: true,
     swaggerOptions: {
