@@ -59,7 +59,7 @@ export class UserController {
     status: 409,
     description: 'Người dùng đã tồn tại trong hệ thống.',
   })
-  @ApiOperation({ summary: 'Tạo người dùng.' })
+  @ApiOperation({ summary: 'Đăng kí tài khoản' })
   @ApiResponse({ status: 201, description: 'Tạo người dùng thành công' })
   async create(@Body() createUserDto: CreateUserDto) {
     return await this.connection.transaction((transactionManager) => {
