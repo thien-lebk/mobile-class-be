@@ -104,6 +104,7 @@ export class UserService {
     user.aboutYou = aboutYou;
     user.dob = dob;
     user.phoneNumber = phoneNumber;
+    user.isFirstLogin = false;
     // console.log(hobbies);
     const hobbiesList = await this.hobbyService.getListForUpdateUser(hobbies);
     console.log(hobbiesList);

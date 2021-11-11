@@ -78,11 +78,7 @@ export class UserController {
   })
   @ApiOperation({ summary: 'Chỉnh sửa người dùng.' })
   @UseGuards(JwtAuthenticationGuard)
-  async update(
-    @Body() updateUserDto: UpdateUserDto,
-    @Param('uuid') uuid: string,
-    @AuthUser() user: any,
-  ) {
+  async update(@Body() updateUserDto: UpdateUserDto, @AuthUser() user: any) {
     return await this.connection.transaction((transactionManager) => {
       return this.userService.updateUser(
         transactionManager,
