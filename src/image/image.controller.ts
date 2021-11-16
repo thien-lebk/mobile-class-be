@@ -75,7 +75,6 @@ export class ImageController {
 
   //ver 2
   //Download img
-  @UseGuards(JwtAuthenticationGuard)
   @ApiOperation({ summary: 'Download hình' })
   @Get('download/:imgpath')
   seeUploadedFile(@Param('imgpath') image, @Res() res) {
