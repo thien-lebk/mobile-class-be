@@ -1,3 +1,4 @@
+import { getFileUrl } from './file-upload.utils';
 import { UserRepository } from './../user/user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserService } from 'src/user/user.service';
@@ -71,6 +72,28 @@ export class ImageService {
 
       // user.images.push(image);
       // await this.userRepository.save(user);
+      return { statusCode: 201, message: 'Create Success.', data: image };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('Error.');
+    }
+  }
+  async createImageV2(filename: any, id: any, type: string) {
+    try {
+      const user = await this.userRepository.getInfoUser(id);
+
+      const image = await this.imageRepo.save({
+        type,
+        isDeleted: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        user: user,
+        url: getFileUrl(filename),
+      });
+
+      // user.images.push(image);
+      // await this.userRepository.save(user);
+      image.user = null;
       return { statusCode: 201, message: 'Create Success.', data: image };
     } catch (error) {
       console.log(error);
