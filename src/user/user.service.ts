@@ -202,6 +202,7 @@ export class UserService {
     // }
     // // send email
     // return this.emailService.sendResetPasswordEmail(emailInfoDto, originName);
+    return { statusCode: 200, message: 'Email has been sent !' };
   }
 
   private encryptDataToToken(data) {
