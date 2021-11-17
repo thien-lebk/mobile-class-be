@@ -95,7 +95,7 @@ export class UserController {
   })
   @ApiResponse({ status: 201, description: 'Gửi mail thành công' })
   @ApiOperation({ summary: 'Gửi email quên mật khẩu.' })
-  async sendResetPasswordEmail(@Param('email') email: string) {
+  async sendResetPasswordEmail(@Body('email') email: string) {
     return await this.connection.transaction((transactionManager) => {
       return this.userService.sendResetPasswordEmail(transactionManager, email);
     });
