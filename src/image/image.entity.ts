@@ -28,6 +28,9 @@ export class Image extends BaseEntity {
   content: string;
 
   @Column()
+  url: string;
+
+  @Column()
   isDeleted: boolean;
 
   @Column({

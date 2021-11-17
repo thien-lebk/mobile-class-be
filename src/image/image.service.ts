@@ -81,7 +81,6 @@ export class ImageService {
   async createImageV2(filename: any, id: any, type: string) {
     try {
       const user = await this.userRepository.getInfoUser(id);
-
       const image = await this.imageRepo.save({
         type,
         isDeleted: false,
@@ -91,8 +90,6 @@ export class ImageService {
         url: getFileUrl(filename),
       });
 
-      // user.images.push(image);
-      // await this.userRepository.save(user);
       image.user = null;
       return { statusCode: 201, message: 'Create Success.', data: image };
     } catch (error) {
