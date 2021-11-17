@@ -88,7 +88,7 @@ export class UserController {
     });
   }
 
-  @Post('send-email-reset-password/:email')
+  @Post('send-email-reset-password/')
   @ApiResponse({
     status: 500,
     description: 'Lỗi trong quá trình gửi email, hoặc email không đúng.',
