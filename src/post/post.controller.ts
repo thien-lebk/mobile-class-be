@@ -63,7 +63,7 @@ export class PostController {
     status: 200,
     description: 'Delete Success.',
   })
-  @ApiOperation({ summary: 'Xoá Post' })
+  @ApiOperation({ summary: 'Xoá Post từ id post' })
   async deletePost(@AuthUser() user: any, @Param('id') id: number) {
     return await this.postService.deletePost(id, user.userId);
   }
