@@ -93,8 +93,7 @@ export class UserService {
     updateUserDto: UpdateUserDto,
     id: string,
   ) {
-    const { fullName, aboutYou, dob, phoneNumber, hobbies } = updateUserDto;
-
+    const { fullName, aboutYou, dob, phoneNumber, hobbies } = updateUserDto;    
     const user = await this.usersRepository.findOne(id);
 
     if (isNullOrUndefined(user)) {
@@ -107,10 +106,14 @@ export class UserService {
     user.isFirstLogin = false;
     // console.log(hobbies);
     const hobbiesList = await this.hobbyService.getListForUpdateUser(hobbies);
-    console.log(hobbiesList);
+    const user2 = await this.usersRepository.findOne(id);
+
+    user2.hobbies = [];
+    await user2.save();
     user.hobbies = hobbiesList;
+
     try {
-      await this.usersRepository.save(user);
+      await user.save();
       return { statusCode: 200, message: 'Update success.' };
     } catch (error) {
       Logger.error(error);

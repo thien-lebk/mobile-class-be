@@ -83,7 +83,7 @@ export class UserController {
       return this.userService.updateUser(
         transactionManager,
         updateUserDto,
-        user,
+        user.userId,
       );
     });
   }

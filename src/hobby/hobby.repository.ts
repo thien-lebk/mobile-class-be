@@ -12,11 +12,13 @@ import {
   EntityManager,
   getConnection,
   Connection,
+  Brackets,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { isNullOrUndefined, paramStringToJson } from '../lib/utils/util';
 import { Hobby } from './hobby.entity';
+import { ListHobby } from 'src/user/dto/update-user.dto';
 
 @EntityRepository(Hobby)
 export class HobbyRepository extends Repository<Hobby> {
@@ -38,16 +40,24 @@ export class HobbyRepository extends Repository<Hobby> {
       throw new Error('Method not implemented.');
     }
   }
-  async getListForUpdateUser(hobbies: Hobby[]) {
+  async getListForUpdateUser(hobbies: ListHobby[]) {
     const query = this.connection
       .getRepository(Hobby)
       .createQueryBuilder('hobby')
       .where('hobby.isDeleted = false');      
-    hobbies.forEach((element) => {
-      query.orWhere('hobby.id = :id', { id: element.id });
-    });
-    try {
-      
+    // hobbies.forEach((element) => {
+    //   query.orWhere('hobby.id = :id', { id: element.id });
+    // });
+
+
+    query.andWhere(
+      new Brackets((qb) => {
+        hobbies.forEach((element) => {
+          qb.orWhere('hobby.id = :id', { id: element.id });
+        });
+      }),
+    );
+    try {      
       return await query.getMany();
     } catch (error) {
       console.log(error);

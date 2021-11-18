@@ -6,6 +6,8 @@ import {
   Length,
   Matches,
   IsBoolean,
+  isNumber,
+  IsNumber,
 } from 'class-validator';
 import { Hobby } from 'src/hobby/hobby.entity';
 import { Image } from 'src/image/image.entity';
@@ -32,7 +34,12 @@ export class UpdateUserDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  hobbies: Hobby[];
-  
+  hobbies: ListHobby[];
 }
 
+export class ListHobby {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  id: number;
+}

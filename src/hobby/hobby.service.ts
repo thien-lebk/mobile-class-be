@@ -9,6 +9,7 @@ import { UpdateHobbyDto } from './dto/update-hobby.dto';
 import { HobbyRepository } from './hobby.repository';
 import { Hobby } from './hobby.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ListHobby } from 'src/user/dto/update-user.dto';
 
 @Injectable()
 export class HobbyService {
@@ -30,12 +31,11 @@ export class HobbyService {
     }
   }
 
-  async getListForUpdateUser(hobbies: Hobby[]) {
+  async getListForUpdateUser(hobbies: ListHobby[]) {
     return await this.hobbyRepo.getListForUpdateUser(hobbies);
   }
   async getList() {
     try {
-      console.log(123);
       const data = await this.hobbyRepo.find({ isDeleted: false });
 
       return { statusCode: 201, message: 'Get success.', data };

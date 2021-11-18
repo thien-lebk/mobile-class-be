@@ -71,7 +71,7 @@ export class User extends BaseEntity {
   @Column()
   dob: Date;
 
-  @ManyToMany(() => Hobby)
+  @ManyToMany(() => Hobby, { cascade: true })
   @JoinTable({
     name: 'user_hobbies_user',
     joinColumn: { name: 'user_id', referencedColumnName: 'id' },
