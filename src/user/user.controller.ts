@@ -40,12 +40,14 @@ export class UserController {
   async getAllUser(
     @Query() getAllUserPageDto: GetAllUserPageDto,
     @Body() getAllUserDto: GetAllUserDto,
+    @AuthUser() user: any,
   ) {
     return await this.connection.transaction((transactionManager) => {
       return this.userService.getAllUser(
         transactionManager,
         getAllUserPageDto,
         getAllUserDto,
+        user.userId,
       );
     });
   }

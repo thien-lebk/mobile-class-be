@@ -96,6 +96,7 @@ export class UserRepository extends Repository<User> {
     transactionManager: EntityManager,
     getAllUserPageDto: GetAllUserPageDto,
     getAllUserDto: GetAllUserDto,
+    id:number,
   ) {
     const { page } = getAllUserPageDto;
     const { filter } = getAllUserDto;
@@ -115,9 +116,11 @@ export class UserRepository extends Repository<User> {
         'user.aboutYou',
         'user.dob',
       ])
-      .leftJoin('user.hobbies', 'hobby', 'hobby.isDeleted = FALSE')
-      .leftJoin('user.images', 'image', 'image.isDeleted = false')
+      .leftJoin('user.hobbies', 'hobby', 'hobby.isDeleted = false')
+      .leftJoin('user.images', 'image', 'image.isDeleted = false and image.type = :type',{type:'cover'})
       .where('user.isDeleted = false')
+      .andWhere('user.id != :id',{id:id})
+      // .andWhere('image.type = :type',{type:'cover'})
       .take(perPage)
       .skip((page - 1) * perPage)
       .orderBy('user.fullName', 'ASC');

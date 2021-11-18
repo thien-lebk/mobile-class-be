@@ -93,7 +93,7 @@ export class UserService {
     updateUserDto: UpdateUserDto,
     id: string,
   ) {
-    const { fullName, aboutYou, dob, phoneNumber, hobbies } = updateUserDto;    
+    const { fullName, aboutYou, dob, phoneNumber, hobbies } = updateUserDto;
     const user = await this.usersRepository.findOne(id);
 
     if (isNullOrUndefined(user)) {
@@ -126,11 +126,13 @@ export class UserService {
     transactionManager: EntityManager,
     getAllUserPageDto: GetAllUserPageDto,
     getAllUserDto: GetAllUserDto,
+    id: number,
   ) {
     const data = await this.usersRepository.getAllUser(
       transactionManager,
       getAllUserPageDto,
       getAllUserDto,
+      id,
     );
     return { statusCode: 201, message: 'Get success.', data };
   }
