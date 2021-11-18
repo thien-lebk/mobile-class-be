@@ -80,9 +80,11 @@ export class ImageService {
   }
   async createImageV2(filename: any, id: any, type: string) {
     try {
+      console.log(JSON.parse(JSON.stringify(type)).type);
+      
       const user = await this.userRepository.getInfoUser(id);
       const image = await this.imageRepo.save({
-        type,
+        type: JSON.parse(JSON.stringify(type)).type,
         isDeleted: false,
         createdAt: new Date(),
         updatedAt: new Date(),
